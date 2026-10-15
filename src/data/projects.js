@@ -66,7 +66,7 @@ export const directory = [
     description: 'Find me on Instagram and follow along beyond the code.',
     category: 'Socials',
     kind: 'SOCIAL PROFILE',
-    url: 'https://www.instagram.com/qayoom.akhtar',
+    url: 'https://www.instagram.com/entropy404x/',
     mark: '◎',
     tone: 'pink',
     tags: ['instagram', 'social', 'personal']
