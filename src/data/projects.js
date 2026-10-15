@@ -12,8 +12,18 @@ export const directory = [
     tags: ['games', 'ludo', 'multiplayer', 'tic tac toe', 'next.js', 'socket.io']
   },
   {
+    title: 'Qayoom Portfolio',
+    description: 'My developer portfolio with selected projects, engineering background, and resume.',
+    category: 'Websites',
+    kind: 'LIVE WEBSITE',
+    url: 'https://qayoom-portfolio.vercel.app/',
+    icon: 'globe',
+    tone: 'violet',
+    tags: ['portfolio', 'developer', 'projects', 'resume']
+  },
+  {
     title: 'Game Galaxy Hub — Source',
-    description: 'The codebase for the multiplayer game hub, including its Next.js frontend and game systems.',
+    description: 'The public codebase for the multiplayer game hub and its game systems.',
     category: 'Repositories',
     kind: 'GITHUB REPOSITORY',
     url: 'https://github.com/test-Ois/Game-Galaxy-Hub',
@@ -32,26 +42,6 @@ export const directory = [
     tags: ['e-commerce', 'shopping', 'AI', 'MERN', 'Next.js']
   },
   {
-    title: 'Love Bird',
-    description: 'A personal, cinematic story experience with chapter reveals, music, and animated memories.',
-    category: 'Repositories',
-    kind: 'GITHUB REPOSITORY',
-    url: 'https://github.com/test-Ois/love-bird',
-    icon: 'heart',
-    tone: 'pink',
-    tags: ['storytelling', 'animation', 'music', 'memories']
-  },
-  {
-    title: 'AI Career Agent',
-    description: 'A project focused on AI-assisted career workflows and making the job search more manageable.',
-    category: 'Repositories',
-    kind: 'GITHUB REPOSITORY',
-    url: 'https://github.com/test-Ois/ai-career-agent',
-    mark: 'AI',
-    tone: 'blue',
-    tags: ['AI', 'career', 'jobs', 'automation']
-  },
-  {
     title: 'GitHub',
     description: 'Browse public repositories, experiments, and the code behind my projects.',
     category: 'Socials',
@@ -60,6 +50,36 @@ export const directory = [
     icon: 'github',
     tone: 'lime',
     tags: ['profile', 'open source', 'code']
+  },
+  {
+    title: 'LinkedIn',
+    description: 'Connect with me for professional updates, opportunities, and collaboration.',
+    category: 'Socials',
+    kind: 'PROFESSIONAL PROFILE',
+    url: 'https://www.linkedin.com/in/qayoom-akhtar',
+    mark: 'in',
+    tone: 'blue',
+    tags: ['career', 'professional', 'network']
+  },
+  {
+    title: 'Instagram',
+    description: 'Find me on Instagram and follow along beyond the code.',
+    category: 'Socials',
+    kind: 'SOCIAL PROFILE',
+    url: 'https://www.instagram.com/qayoom.akhtar',
+    mark: '◎',
+    tone: 'pink',
+    tags: ['instagram', 'social', 'personal']
+  },
+  {
+    title: 'Resume',
+    description: 'Open my resume folder for the latest professional profile and documents.',
+    category: 'Socials',
+    kind: 'RESUME',
+    url: 'https://drive.google.com/drive/u/0/folders/1WayKbomGqVUlmhQbi9Y2GgXN-Q2V1IDL',
+    mark: 'CV',
+    tone: 'orange',
+    tags: ['resume', 'career', 'experience']
   },
   {
     title: 'Vercel',
