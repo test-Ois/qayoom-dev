@@ -29,20 +29,20 @@ function WelcomeIntro({ onEnter }) {
     <div className="intro-star star-a">✳</div><div className="intro-star star-b">✦</div><div className="intro-star star-c">·</div><div className="intro-star star-d">✳</div>
     <div className="intro-content">
       <div className="intro-logo-wrap"><div className="intro-logo"><svg viewBox="0 0 80 80" aria-hidden="true"><path d="M40 9a31 31 0 1 0 20 54.7L70 74" /><path d="M53.2 40a13.2 13.2 0 1 1-26.4 0 13.2 13.2 0 0 1 26.4 0Z" /></svg></div><span className="logo-ping" /></div>
-      <p className="intro-kicker"><span /> YOUR LINKS. YOUR WORLD.</p>
+      <p className="intro-kicker"><span /> A PERSONAL LINK UNIVERSE</p>
       <h1>Welcome to<br /><span>my digital space.</span></h1>
-      <p className="intro-description">A little corner of the internet where all my websites, projects, tools, and links come together.</p>
-      <button className="enter-button" onClick={onEnter}><span>Enter Qayoom.dev</span><Icon name="arrow" size={18} /></button>
-      <p className="intro-foot">TAKE A LOOK AROUND <span>✳</span></p>
+      <p className="intro-description">A hand-picked map to my live websites, open projects, everyday tools, and the places where I share my work.</p>
+      <button className="enter-button" onClick={onEnter}><span>Explore the hub</span><Icon name="arrow" size={18} /></button>
+      <p className="intro-foot">MADE TO BE EXPLORED <span>✳</span></p>
     </div>
-    <div className="intro-bottom"><Brand compact /><span>PERSONAL LINK HUB <i>·</i> EST. 2026</span></div>
+    <div className="intro-bottom"><Brand compact /><span>LINKS <i>·</i> PROJECTS <i>·</i> DISCOVERIES</span></div>
   </section>
 }
 
 function LinkCard({ item, index }) {
   return <a className="link-card" href={item.url} target="_blank" rel="noreferrer" style={{ '--card-delay': `${index * 55}ms` }}>
     <span className={`link-icon icon-${item.tone || 'lime'}`}>{item.mark ? <span className="link-mark">{item.mark}</span> : <Icon name={item.icon || 'globe'} size={21} />}</span>
-    <span className="link-copy"><span className="link-title">{item.title}{item.badge && <span className="link-badge">{item.badge}</span>}</span><span className="link-description">{item.description}</span><span className="link-kind">{item.kind}</span></span>
+    <span className="link-copy"><span className="link-title">{item.title}{item.badge && <span className="link-badge">{item.badge}</span>}</span><span className="link-description">{item.description}</span><span className="link-kind">{item.kind}</span><span className="link-tags">{item.tags.slice(0, 3).map(tag => <span key={tag}>{tag}</span>)}</span></span>
     <span className="link-arrow"><Icon name="external" size={16} /></span>
   </a>
 }
@@ -83,8 +83,8 @@ export default function App() {
     const searchMatch = !q || `${item.title} ${item.description} ${item.category} ${item.kind} ${(item.tags || []).join(' ')}`.toLowerCase().includes(q)
     return categoryMatch && searchMatch
   }), [activeCategory, query])
-
   const countFor = category => directory.filter(item => category === 'All links' || item.category === category).length
+  const featured = directory.find(item => item.featured)
 
   return <div className={`site-shell theme-${theme}`}>
     {showIntro && <WelcomeIntro onEnter={enterSite} />}
@@ -92,22 +92,36 @@ export default function App() {
       <div className="ambient ambient-one" /><div className="ambient ambient-two" />
       <header className="topbar wrap">
         <Brand />
-        <div className="topbar-right"><span className="availability"><i /> DIGITAL SPACE ONLINE</span><button className="theme-toggle" onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')} aria-label={`Switch to ${theme === 'dark' ? 'light' : 'dark'} theme`}><Icon name={theme === 'dark' ? 'sun' : 'moon'} size={17} /></button><a className="github-shortcut" href="https://github.com/test-Ois" target="_blank" rel="noreferrer" aria-label="GitHub profile"><Icon name="github" size={18} /></a></div>
+        <div className="topbar-right"><span className="availability"><i /> THE HUB IS OPEN</span><button className="theme-toggle" onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')} aria-label={`Switch to ${theme === 'dark' ? 'light' : 'dark'} theme`}><Icon name={theme === 'dark' ? 'sun' : 'moon'} size={17} /></button><a className="github-shortcut" href="https://github.com/test-Ois" target="_blank" rel="noreferrer" aria-label="GitHub profile"><Icon name="github" size={18} /></a></div>
       </header>
       <main className="wrap hub-main">
         <section className="hub-heading">
           <div className="heading-orbit"><div className="orbit-core"><Brand compact /></div><span className="orbit-dot orbit-dot-one" /><span className="orbit-dot orbit-dot-two" /></div>
-          <div className="hub-heading-copy"><p className="eyebrow"><Icon name="spark" size={14} /> MY LITTLE CORNER OF THE INTERNET</p><h1>Everything, <span>in one place.</span></h1><p className="hub-subtitle">Websites I've made, code I've shared, tools I use, and places to find me.</p></div>
+          <div className="hub-heading-copy"><p className="eyebrow"><Icon name="spark" size={14} /> A SMALL CORNER, A LOT TO EXPLORE</p><h1>Find your next <span>click.</span></h1><p className="hub-subtitle">Live builds, open-source code, useful tools, and a few experiments. Everything here goes somewhere real.</p></div>
         </section>
-        <section className="search-section" aria-label="Search links"><label className="hub-search"><Icon name="search" size={21} /><input ref={searchRef} value={query} onChange={e => setQuery(e.target.value)} placeholder="Find a website, repository, tool..." aria-label="Search all links" /><kbd>/</kbd>{query && <button className="clear-search" onClick={() => setQuery('')} aria-label="Clear search">×</button>}</label><span className="search-hint">TIP: SEARCH BY NAME OR TYPE</span></section>
+        <section className="hub-stats" aria-label="Hub overview">
+          <div><strong>{directory.filter(item => item.category === 'Websites').length.toString().padStart(2, '0')}</strong><span>LIVE DESTINATION</span></div>
+          <div><strong>{directory.filter(item => item.category === 'Repositories').length.toString().padStart(2, '0')}</strong><span>OPEN PROJECTS</span></div>
+          <div><strong>{directory.filter(item => item.category === 'Tools').length.toString().padStart(2, '0')}</strong><span>GO-TO TOOLS</span></div>
+          <p><span className="stats-spark">✳</span> Curated, not cluttered.<br /><small>Only links worth keeping.</small></p>
+        </section>
+        {featured && <section className="featured-section" aria-label="Featured website">
+          <div className="section-kicker"><span>01 / START HERE</span><span>FEATURED DESTINATION</span></div>
+          <a className="featured-card" href={featured.url} target="_blank" rel="noreferrer">
+            <div className="featured-art"><div className="featured-orbit featured-orbit-a" /><div className="featured-orbit featured-orbit-b" /><div className="featured-emblem">GG<span>✳</span></div><span className="featured-art-label">PLAY / CONNECT / REPEAT</span></div>
+            <div className="featured-copy"><span className="featured-pill"><i /> LIVE PROJECT</span><h2>Game Galaxy <span>Hub</span></h2><p>A multi-game playground built around quick matches and playing together. Jump into Tic-Tac-Toe, Ludo, and real-time multiplayer rooms.</p><div className="featured-tags"><span>Multiplayer</span><span>Tic-Tac-Toe</span><span>Ludo</span><span>Real-time rooms</span></div><span className="featured-cta">Open the game hub <Icon name="arrow" size={17} /></span></div>
+            <span className="featured-external"><Icon name="external" size={18} /></span>
+          </a>
+        </section>}
+        <section className="search-section" aria-label="Search links"><label className="hub-search"><Icon name="search" size={21} /><input ref={searchRef} value={query} onChange={e => setQuery(e.target.value)} placeholder="Search projects, tools, or topics..." aria-label="Search all links" /><kbd>/</kbd>{query && <button className="clear-search" onClick={() => setQuery('')} aria-label="Clear search">×</button>}</label><span className="search-hint">TRY “LUDO”, “AI”, “ANIMATION” OR PRESS / TO SEARCH</span></section>
         <nav className="category-nav" aria-label="Link categories">{categories.map(category => <button key={category} className={activeCategory === category ? 'category-tab active' : 'category-tab'} onClick={() => setActiveCategory(category)}><Icon name={category === 'All links' ? 'spark' : category === 'Websites' ? 'globe' : category === 'Repositories' ? 'folder' : category === 'Tools' ? 'tool' : 'heart'} size={16} /><span>{category}</span><small>{countFor(category)}</small></button>)}</nav>
         <section className="directory-section">
-          <div className="directory-heading"><div><p className="eyebrow">THE DIRECTORY</p><h2>{activeCategory === 'All links' ? 'Your map around here.' : activeCategory + '.'}</h2></div><span className="result-count">{visibleLinks.length.toString().padStart(2, '0')} LINKS FOUND</span></div>
-          {visibleLinks.length ? <div className="link-grid">{visibleLinks.map((item, index) => <LinkCard key={`${item.category}-${item.title}`} item={item} index={index} />)}</div> : <div className="empty-state"><Icon name="search" size={25} /><strong>No links found.</strong><span>Try another search or choose a different category.</span><button onClick={() => { setQuery(''); setActiveCategory('All links') }}>Show all links <Icon name="arrow" size={15} /></button></div>}
+          <div className="directory-heading"><div><p className="eyebrow">02 / THE DIRECTORY</p><h2>{activeCategory === 'All links' ? 'Pick a path.' : activeCategory + '.'}</h2></div><span className="result-count">{visibleLinks.length.toString().padStart(2, '0')} LINKS</span></div>
+          {visibleLinks.length ? <div className="link-grid">{visibleLinks.map((item, index) => <LinkCard key={item.url} item={item} index={index} />)}</div> : <div className="empty-state"><Icon name="search" size={25} /><strong>No links found.</strong><span>Try another search or choose a different category.</span><button onClick={() => { setQuery(''); setActiveCategory('All links') }}>Show all links <Icon name="arrow" size={15} /></button></div>}
         </section>
-        <section className="small-note"><span className="note-icon"><Icon name="spark" size={18} /></span><p><strong>One place. Many little worlds.</strong><span>This space will keep growing as new links and projects come to life.</span></p><a href="https://github.com/test-Ois?tab=repositories" target="_blank" rel="noreferrer">Explore GitHub <Icon name="arrow" size={15} /></a></section>
+        <section className="hub-note"><div className="hub-note-mark">Q.</div><div><span className="eyebrow">A NOTE FROM THIS CORNER</span><h3>Built out of curiosity.</h3><p>Some links are finished experiences, some are works in progress, and some are tools that make building easier. This page is the short route to all of them.</p></div><span className="note-decoration">✳</span></section>
       </main>
-      <footer className="footer wrap"><Brand compact /><span className="footer-message">A personal corner of the internet <i>✳</i></span><div className="footer-actions"><button onClick={replayIntro}>Replay intro ↗</button><span>© {new Date().getFullYear()} Qayoom</span></div></footer>
+      <footer className="footer wrap"><Brand compact /><span className="footer-message">Keep exploring. Keep making. <i>✳</i></span><div className="footer-actions"><button onClick={replayIntro}>Replay intro ↗</button><span>© {new Date().getFullYear()} Qayoom</span></div></footer>
     </div>
   </div>
 }
