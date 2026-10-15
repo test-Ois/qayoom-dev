@@ -1,102 +1,113 @@
-import { useMemo, useState } from 'react'
-import { categories, projects } from './data/projects.js'
+import { useEffect, useMemo, useRef, useState } from 'react'
+import { directory, categories } from './data/projects.js'
 
-const Icon = ({ name, size = 18 }) => {
-  const paths = {
+function Icon({ name, size = 18 }) {
+  const common = { width: size, height: size, viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', strokeWidth: 1.7, strokeLinecap: 'round', strokeLinejoin: 'round', 'aria-hidden': true }
+  const shapes = {
     arrow: <><path d="M5 12h14" /><path d="m12 5 7 7-7 7" /></>,
+    external: <><path d="M14 3h7v7" /><path d="M10 14 21 3" /><path d="M19 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2h6" /></>,
+    search: <><circle cx="10.8" cy="10.8" r="6.8" /><path d="m16 16 4.5 4.5" /></>,
     github: <><path d="M9 19c-4.3 1.4-4.3-2.5-6-3m12 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 19 4.77 5.07 5.07 0 0 0 18.91 1S17.73.65 15 2.48a13.38 13.38 0 0 0-7 0C5.27.65 4.09 1 4.09 1A5.07 5.07 0 0 0 4 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 8 18.13V22" /></>,
+    globe: <><circle cx="12" cy="12" r="9" /><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18" /></>,
+    folder: <><path d="M3 7a2 2 0 0 1 2-2h5l2 2h7a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" /><path d="M3 10h18" /></>,
+    tool: <><path d="M14.7 6.3a5 5 0 0 0-6.6 6.6L3 18l3 3 5.1-5.1a5 5 0 0 0 6.6-6.6L14 13l-3-3z" /></>,
     sun: <><circle cx="12" cy="12" r="4" /><path d="M12 2v2m0 16v2M4.93 4.93l1.42 1.42m11.3 11.3 1.42 1.42M2 12h2m16 0h2M4.93 19.07l1.42-1.42m11.3-11.3 1.42-1.42" /></>,
     moon: <path d="M20.9 13A9 9 0 0 1 11 3.1 9 9 0 1 0 20.9 13Z" />,
-    external: <><path d="M15 3h6v6" /><path d="M10 14 21 3" /><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" /></>,
     spark: <><path d="m12 3 1.9 5.8L20 11l-6.1 2.2L12 19l-2-5.8L4 11l6-2.2L12 3Z" /><path d="m19 14 1.2 2.8L23 18l-2.8 1.2L19 22l-1.2-2.8L15 18l2.8-1.2L19 14Z" /></>,
-    menu: <><path d="M4 7h16M4 12h16M4 17h16" /></>,
+    heart: <path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1.1-1.1a5.5 5.5 0 0 0-7.8 7.8l1.1 1.1L12 21l7.8-7.5 1.1-1.1a5.5 5.5 0 0 0-.1-7.8Z" />
   }
-  return <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">{paths[name]}</svg>
+  return <svg {...common}>{shapes[name] || shapes.globe}</svg>
 }
 
-function ProjectCard({ project, index }) {
-  return (
-    <article className="project-card" style={{ '--delay': `${index * 70}ms` }}>
-      <div className={`project-art ${project.tone}`}>
-        <span className="project-mark">{project.mark}</span>
-        <span className="art-orbit orbit-one" />
-        <span className="art-orbit orbit-two" />
-        <span className="art-caption">PROJECT / {String(index + 1).padStart(2, '0')}</span>
-        {project.featured && <span className="featured-tag"><span /> Featured</span>}
-      </div>
-      <div className="project-content">
-        <div className="project-title-row"><h3>{project.name}</h3><span className="project-category">{project.category}</span></div>
-        <p>{project.description}</p>
-        <div className="stack-list">{project.stack.map((tech) => <span key={tech}>{tech}</span>)}</div>
-        <div className="project-links">
-          {project.live && <a href={project.live} target="_blank" rel="noreferrer">Live preview <Icon name="external" size={15} /></a>}
-          {project.github && <a href={project.github} target="_blank" rel="noreferrer">Source code <Icon name="github" size={15} /></a>}
-          {!project.live && !project.github && <span className="soon-label">Repository link coming soon</span>}
-        </div>
-      </div>
-    </article>
-  )
+function Brand({ compact = false }) {
+  return <a className={compact ? 'brand brand-compact' : 'brand'} href="#home" aria-label="Qayoom.dev home"><span className="brand-symbol"><svg viewBox="0 0 40 40" aria-hidden="true"><path d="M20 5.5a14.5 14.5 0 1 0 9.4 25.5L34 35" /><path d="M26.2 20a6.2 6.2 0 1 1-12.4 0 6.2 6.2 0 0 1 12.4 0Z" /></svg></span><span className="brand-word">qayoom<span>.dev</span></span></a>
+}
+
+function WelcomeIntro({ onEnter }) {
+  return <section className="intro-screen" aria-label="Welcome to Qayoom.dev">
+    <div className="intro-noise" /><div className="intro-grid" />
+    <div className="intro-star star-a">✳</div><div className="intro-star star-b">✦</div><div className="intro-star star-c">·</div><div className="intro-star star-d">✳</div>
+    <div className="intro-content">
+      <div className="intro-logo-wrap"><div className="intro-logo"><svg viewBox="0 0 80 80" aria-hidden="true"><path d="M40 9a31 31 0 1 0 20 54.7L70 74" /><path d="M53.2 40a13.2 13.2 0 1 1-26.4 0 13.2 13.2 0 0 1 26.4 0Z" /></svg></div><span className="logo-ping" /></div>
+      <p className="intro-kicker"><span /> YOUR LINKS. YOUR WORLD.</p>
+      <h1>Welcome to<br /><span>my digital space.</span></h1>
+      <p className="intro-description">A little corner of the internet where all my websites, projects, tools, and links come together.</p>
+      <button className="enter-button" onClick={onEnter}><span>Enter Qayoom.dev</span><Icon name="arrow" size={18} /></button>
+      <p className="intro-foot">TAKE A LOOK AROUND <span>✳</span></p>
+    </div>
+    <div className="intro-bottom"><Brand compact /><span>PERSONAL LINK HUB <i>·</i> EST. 2026</span></div>
+  </section>
+}
+
+function LinkCard({ item, index }) {
+  return <a className="link-card" href={item.url} target="_blank" rel="noreferrer" style={{ '--card-delay': `${index * 55}ms` }}>
+    <span className={`link-icon icon-${item.tone || 'lime'}`}>{item.mark ? <span className="link-mark">{item.mark}</span> : <Icon name={item.icon || 'globe'} size={21} />}</span>
+    <span className="link-copy"><span className="link-title">{item.title}{item.badge && <span className="link-badge">{item.badge}</span>}</span><span className="link-description">{item.description}</span><span className="link-kind">{item.kind}</span></span>
+    <span className="link-arrow"><Icon name="external" size={16} /></span>
+  </a>
 }
 
 export default function App() {
   const [theme, setTheme] = useState('dark')
-  const [activeCategory, setActiveCategory] = useState('All')
+  const [activeCategory, setActiveCategory] = useState('All links')
   const [query, setQuery] = useState('')
-  const visibleProjects = useMemo(() => projects.filter((project) => {
-    const matchesCategory = activeCategory === 'All' || project.category === activeCategory
-    const searchText = `${project.name} ${project.description} ${project.stack.join(' ')}`.toLowerCase()
-    return matchesCategory && searchText.includes(query.toLowerCase().trim())
+  const [showIntro, setShowIntro] = useState(() => {
+    try { return window.localStorage.getItem('qayoom-intro-seen') !== 'yes' } catch { return true }
+  })
+  const searchRef = useRef(null)
+
+  useEffect(() => {
+    const handleShortcut = event => {
+      if (event.key === '/' && !['INPUT', 'TEXTAREA'].includes(document.activeElement?.tagName) && !event.metaKey && !event.ctrlKey && !event.altKey) {
+        event.preventDefault()
+        searchRef.current?.focus()
+      }
+      if (event.key === 'Escape' && document.activeElement === searchRef.current) setQuery('')
+    }
+    window.addEventListener('keydown', handleShortcut)
+    return () => window.removeEventListener('keydown', handleShortcut)
+  }, [])
+
+  const enterSite = () => {
+    try { window.localStorage.setItem('qayoom-intro-seen', 'yes') } catch {}
+    setShowIntro(false)
+  }
+  const replayIntro = () => {
+    setShowIntro(true)
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+  }
+
+  const visibleLinks = useMemo(() => directory.filter(item => {
+    const categoryMatch = activeCategory === 'All links' || item.category === activeCategory
+    const q = query.trim().toLowerCase()
+    const searchMatch = !q || `${item.title} ${item.description} ${item.category} ${item.kind} ${(item.tags || []).join(' ')}`.toLowerCase().includes(q)
+    return categoryMatch && searchMatch
   }), [activeCategory, query])
 
-  return (
-    <div className={`site-shell theme-${theme}`}>
+  const countFor = category => directory.filter(item => category === 'All links' || item.category === category).length
+
+  return <div className={`site-shell theme-${theme}`}>
+    {showIntro && <WelcomeIntro onEnter={enterSite} />}
+    <div className={`main-site ${showIntro ? 'main-hidden' : 'main-visible'}`} id="home">
       <div className="ambient ambient-one" /><div className="ambient ambient-two" />
       <header className="topbar wrap">
-        <a className="brand" href="#home" aria-label="Qayoom.dev home"><span className="brand-icon">q<span>.</span></span><span>Qayoom<span className="brand-muted">.dev</span></span></a>
-        <nav className="desktop-nav" aria-label="Main navigation"><a href="#work">Work <span>↘</span></a><a href="#about">About <span>↘</span></a><a href="#stats">GitHub <span>↗</span></a><a href="#contact">Contact <span>↘</span></a></nav>
-        <div className="topbar-actions">
-          <button className="theme-toggle" onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')} aria-label={`Switch to ${theme === 'dark' ? 'light' : 'dark'} theme`}><Icon name={theme === 'dark' ? 'sun' : 'moon'} size={17} /></button>
-          <a className="header-cta" href="https://github.com/test-Ois" target="_blank" rel="noreferrer">Let's connect <Icon name="arrow" size={15} /></a>
-        </div>
+        <Brand />
+        <div className="topbar-right"><span className="availability"><i /> DIGITAL SPACE ONLINE</span><button className="theme-toggle" onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')} aria-label={`Switch to ${theme === 'dark' ? 'light' : 'dark'} theme`}><Icon name={theme === 'dark' ? 'sun' : 'moon'} size={17} /></button><a className="github-shortcut" href="https://github.com/test-Ois" target="_blank" rel="noreferrer" aria-label="GitHub profile"><Icon name="github" size={18} /></a></div>
       </header>
-
-      <main id="home">
-        <section className="hero wrap">
-          <div className="hero-copy">
-            <div className="eyebrow"><span className="status-dot" /> DEVELOPER HUB <span className="eyebrow-line" /></div>
-            <h1>Building things<br />for the <span className="highlight-word">digital world.</span></h1>
-            <p className="hero-description">Hey, I'm Qayoom — a developer who likes turning ideas into useful, thoughtful digital experiences. Here's what I've been building.</p>
-            <div className="hero-actions"><a className="button-primary" href="#work">Explore my work <Icon name="arrow" size={17} /></a><a className="button-quiet" href="https://github.com/test-Ois" target="_blank" rel="noreferrer"><Icon name="github" size={17} /> GitHub profile</a></div>
-            <div className="hero-footnote"><span className="footnote-rule" /> Independent builder <span className="footnote-dot">/</span> Always learning</div>
-          </div>
-          <div className="hero-visual" aria-label="Decorative code-inspired illustration">
-            <div className="visual-grid" />
-            <div className="visual-ring ring-large" /><div className="visual-ring ring-small" />
-            <div className="floating-chip chip-top"><span className="chip-led" /> CRAFTING WITH CARE</div>
-            <div className="terminal-card"><div className="terminal-head"><div className="terminal-dots"><i /><i /><i /></div><span>~/qayoom.dev</span><span className="terminal-lock">⌘</span></div><div className="terminal-body"><div><span className="code-muted">01</span> <span className="code-purple">const</span> <span className="code-lime">creator</span> = {'{'}</div><div><span className="code-muted">02</span> &nbsp; name: <span className="code-orange">'Qayoom'</span>,</div><div><span className="code-muted">03</span> &nbsp; focus: <span className="code-orange">'Full stack'</span>,</div><div><span className="code-muted">04</span> &nbsp; mindset: <span className="code-orange">'Keep building'</span></div><div><span className="code-muted">05</span> {'}'}</div><div className="terminal-output"><span className="terminal-cursor" /> ready to create something good<span className="terminal-period">.</span></div></div></div>
-            <div className="floating-chip chip-bottom"><Icon name="spark" size={15} /> IDEAS → REALITY</div>
-            <div className="visual-coordinate">30°44' N<br />76°39' E</div>
-          </div>
+      <main className="wrap hub-main">
+        <section className="hub-heading">
+          <div className="heading-orbit"><div className="orbit-core"><Brand compact /></div><span className="orbit-dot orbit-dot-one" /><span className="orbit-dot orbit-dot-two" /></div>
+          <div className="hub-heading-copy"><p className="eyebrow"><Icon name="spark" size={14} /> MY LITTLE CORNER OF THE INTERNET</p><h1>Everything, <span>in one place.</span></h1><p className="hub-subtitle">Websites I've made, code I've shared, tools I use, and places to find me.</p></div>
         </section>
-
-        <section className="ticker" aria-label="Technologies"><div className="ticker-track"><span>REACT.JS</span><i>✳</i><span>JAVASCRIPT</span><i>✳</i><span>NODE.JS</span><i>✳</i><span>AI INTEGRATION</span><i>✳</i><span>WEB EXPERIENCES</span><i>✳</i><span>REACT.JS</span><i>✳</i><span>JAVASCRIPT</span><i>✳</i><span>NODE.JS</span><i>✳</i><span>AI INTEGRATION</span><i>✳</i><span>WEB EXPERIENCES</span><i>✳</i></div></section>
-
-        <section className="work-section wrap section-pad" id="work">
-          <div className="section-heading"><div><div className="eyebrow">01 / SELECTED WORK</div><h2>A few things I've <span className="heading-muted">put into the world.</span></h2></div><p>Experiments, products, and ideas in progress. Each one is a chance to learn something new.</p></div>
-          <div className="project-toolbar"><div className="filter-list" role="group" aria-label="Filter projects">{categories.map((category) => <button key={category} className={activeCategory === category ? 'filter-button active' : 'filter-button'} onClick={() => setActiveCategory(category)}>{category}</button>)}</div><label className="search-box"><span>⌕</span><input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Find a project..." aria-label="Search projects" /><kbd>/</kbd></label></div>
-          <div className="project-grid">{visibleProjects.map((project, index) => <ProjectCard key={project.name} project={project} index={index} />)}</div>
-          {visibleProjects.length === 0 && <div className="empty-state">No projects match that search. Try another keyword.</div>}
-          <div className="all-projects-note"><span className="note-star">✳</span><span>More projects are taking shape. This list grows as I build.</span><a href="https://github.com/test-Ois?tab=repositories" target="_blank" rel="noreferrer">Browse all repositories <Icon name="arrow" size={15} /></a></div>
+        <section className="search-section" aria-label="Search links"><label className="hub-search"><Icon name="search" size={21} /><input ref={searchRef} value={query} onChange={e => setQuery(e.target.value)} placeholder="Find a website, repository, tool..." aria-label="Search all links" /><kbd>/</kbd>{query && <button className="clear-search" onClick={() => setQuery('')} aria-label="Clear search">×</button>}</label><span className="search-hint">TIP: SEARCH BY NAME OR TYPE</span></section>
+        <nav className="category-nav" aria-label="Link categories">{categories.map(category => <button key={category} className={activeCategory === category ? 'category-tab active' : 'category-tab'} onClick={() => setActiveCategory(category)}><Icon name={category === 'All links' ? 'spark' : category === 'Websites' ? 'globe' : category === 'Repositories' ? 'folder' : category === 'Tools' ? 'tool' : 'heart'} size={16} /><span>{category}</span><small>{countFor(category)}</small></button>)}</nav>
+        <section className="directory-section">
+          <div className="directory-heading"><div><p className="eyebrow">THE DIRECTORY</p><h2>{activeCategory === 'All links' ? 'Your map around here.' : activeCategory + '.'}</h2></div><span className="result-count">{visibleLinks.length.toString().padStart(2, '0')} LINKS FOUND</span></div>
+          {visibleLinks.length ? <div className="link-grid">{visibleLinks.map((item, index) => <LinkCard key={`${item.category}-${item.title}`} item={item} index={index} />)}</div> : <div className="empty-state"><Icon name="search" size={25} /><strong>No links found.</strong><span>Try another search or choose a different category.</span><button onClick={() => { setQuery(''); setActiveCategory('All links') }}>Show all links <Icon name="arrow" size={15} /></button></div>}
         </section>
-
-        <section className="about-section" id="about"><div className="wrap about-inner"><div className="about-label"><div className="eyebrow">02 / A LITTLE ABOUT ME</div><div className="about-stamp">BUILD<br />WITH<br /><span>INTENT.</span></div></div><div className="about-copy"><h2>Curious by nature.<br /><span className="heading-muted">Builder by choice.</span></h2><p>I enjoy creating full-stack web apps, exploring AI integrations, and polishing the little details that make a product feel right. I believe good software should be useful first, clear by design, and always improving.</p><div className="principles"><div><span>01</span><strong>Stay curious</strong><p>Keep exploring new ideas and tools.</p></div><div><span>02</span><strong>Build to learn</strong><p>Turn concepts into working projects.</p></div><div><span>03</span><strong>Mind the details</strong><p>Make the experience feel considered.</p></div></div></div></div></section>
-
-        <section className="stats-section wrap section-pad" id="stats"><div className="section-heading"><div><div className="eyebrow">03 / OPEN SOURCE</div><h2>My corner of <span className="heading-muted">GitHub.</span></h2></div><a className="text-link" href="https://github.com/test-Ois" target="_blank" rel="noreferrer">Follow the journey <Icon name="arrow" size={16} /></a></div><div className="stats-panel"><div className="stats-intro"><span className="stats-github-icon"><Icon name="github" size={28} /></span><h3>Building in public.</h3><p>Projects, experiments, and code — one commit at a time.</p><a href="https://github.com/test-Ois?tab=repositories" target="_blank" rel="noreferrer">Explore repositories <Icon name="arrow" size={15} /></a></div><div className="stats-image-wrap"><img src="https://github-readme-stats.vercel.app/api?username=test-Ois&show_icons=true&hide_border=true&bg_color=00000000&title_color=b7f36b&text_color=9ca69a&icon_color=b7f36b&ring_color=b7f36b" alt="GitHub profile statistics for test-Ois" loading="lazy" onError={(event) => { event.currentTarget.style.display = 'none' }} /><div className="stats-fallback">Live GitHub stats will appear here when the stats service is available.</div></div></div></section>
-
-        <section className="contact-section wrap" id="contact"><div className="contact-card"><div className="contact-orb" /><div className="eyebrow"><span className="status-dot" /> 04 / YOUR TURN</div><h2>Got an idea?<br /><span>Let's make it real.</span></h2><p>Have a project in mind, want to collaborate, or just want to talk tech? Find me on GitHub and let's start there.</p><a className="button-primary" href="https://github.com/test-Ois" target="_blank" rel="noreferrer">Connect on GitHub <Icon name="arrow" size={17} /></a><span className="contact-aside">NO FORMS. NO FUSS. JUST GOOD CONVERSATIONS.</span></div></section>
+        <section className="small-note"><span className="note-icon"><Icon name="spark" size={18} /></span><p><strong>One place. Many little worlds.</strong><span>This space will keep growing as new links and projects come to life.</span></p><a href="https://github.com/test-Ois?tab=repositories" target="_blank" rel="noreferrer">Explore GitHub <Icon name="arrow" size={15} /></a></section>
       </main>
-
-      <footer className="footer wrap"><a className="brand footer-brand" href="#home"><span className="brand-icon">q<span>.</span></span><span>Qayoom<span className="brand-muted">.dev</span></span></a><span className="footer-center">Designed with intention. Built with curiosity.</span><div className="footer-right"><span>© {new Date().getFullYear()} Qayoom</span><a href="https://github.com/test-Ois" target="_blank" rel="noreferrer" aria-label="GitHub"><Icon name="github" size={17} /></a><a href="#home" aria-label="Back to top">↑</a></div></footer>
+      <footer className="footer wrap"><Brand compact /><span className="footer-message">A personal corner of the internet <i>✳</i></span><div className="footer-actions"><button onClick={replayIntro}>Replay intro ↗</button><span>© {new Date().getFullYear()} Qayoom</span></div></footer>
     </div>
-  )
+  </div>
 }
